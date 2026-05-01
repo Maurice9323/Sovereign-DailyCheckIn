@@ -1,0 +1,25 @@
+{
+  "name": "Daily Check-In \u00b7 ALRPG",
+  "short_name": "Check-In",
+  "description": "Antihero Life RPG System \u2014 Daily morning and evening check-in tracker",
+  "start_url": "/Sovereign-DailyCheckIn/",
+  "scope": "/Sovereign-DailyCheckIn/",
+  "display": "standalone",
+  "background_color": "#07090F",
+  "theme_color": "#0A0E1A",
+  "orientation": "portrait-primary",
+  "icons": [
+    {
+      "src": "/Sovereign-DailyCheckIn/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/Sovereign-DailyCheckIn/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
+}
