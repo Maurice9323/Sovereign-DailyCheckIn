@@ -6,972 +6,681 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="Daily Check-In">
-<meta name="theme-color" content="#0A0E1A">
-<link rel="manifest" href="/Sovereign-DailyCheckIn/manifest.json">
-<link rel="apple-touch-icon" href="/Sovereign-DailyCheckIn/icon-192.png">
-<title>Daily Check-In · ALRPG</title>
+<meta name="theme-color" content="#B8962E">
+<title>SOVEREIGN — Daily Check-In</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Space+Mono:ital,wght@0,400;0,700;1,400&family=Syne:wght@400;600;700;800&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=Source+Serif+4:ital,opsz,wght@0,8..60,300;0,8..60,400;0,8..60,600;1,8..60,400&display=swap" rel="stylesheet">
 <style>
-:root {
-  --bg0: #07090F;
-  --bg1: #0A0E1A;
-  --bg2: #0F1525;
-  --bg3: #151D30;
-  --bg4: #1C2640;
-  --accent: #4FFFB0;
-  --accent2: #00D4FF;
-  --accent3: #FF6B6B;
-  --gold: #FFD166;
-  --good: #4FFFB0;
-  --bad: #FFD166;
-  --ugly: #C77DFF;
-  --text: #E8EDF8;
-  --text2: #8892A4;
-  --text3: #4A5568;
-  --border: #1E2A42;
-  --border2: #263354;
-  --morning: #FF9F1C;
-  --evening: #7B2FBE;
-  --font-h: 'Syne', sans-serif;
-  --font-m: 'Space Mono', monospace;
-  --sab: env(safe-area-inset-bottom, 0px);
-  --sat: env(safe-area-inset-top, 0px);
+*{box-sizing:border-box;margin:0;padding:0;}
+:root{
+  --gold:#B8962E;--gold-l:#D4AA44;--gold-glow:rgba(184,150,46,0.15);--gold-dim:rgba(184,150,46,0.08);
+  --dark:#0E0E0C;--card:#161614;--card2:#1C1C1A;
+  --border:#252522;--border2:#2E2E2A;--border3:#3A3A36;
+  --text:#E8E0D0;--muted:#8E8E93;--dim:#555552;--faint:#333330;
+  --good:#4A8C5C;--good-l:rgba(74,140,92,0.12);--good-b:rgba(74,140,92,0.25);
+  --bad:#C49A1A;--bad-l:rgba(196,154,26,0.12);--bad-b:rgba(196,154,26,0.25);
+  --ugly:#7A4A9C;--ugly-l:rgba(122,74,156,0.12);--ugly-b:rgba(122,74,156,0.25);
+  --red:#C46A6A;--red-l:rgba(196,106,106,0.12);--red-b:rgba(196,106,106,0.3);
+  --morning:#C49A1A;--morning-l:rgba(196,154,26,0.1);
+  --evening:#4A6A9C;--evening-l:rgba(74,106,156,0.1);
 }
-*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-html { font-size: 16px; -webkit-text-size-adjust: 100%; overscroll-behavior: none; }
-body {
-  background: var(--bg0); color: var(--text);
-  font-family: var(--font-m); min-height: 100dvh;
-  overflow: hidden;
-}
+html{background:var(--dark);}
+body{background:var(--dark);color:var(--text);font-family:'Source Serif 4',Georgia,serif;min-height:100vh;padding:20px 16px 40px;max-width:640px;margin:0 auto;}
+body::before{content:'';position:fixed;inset:0;background:repeating-linear-gradient(0deg,transparent,transparent 3px,rgba(0,0,0,0.025) 3px,rgba(0,0,0,0.025) 4px);pointer-events:none;z-index:999;}
 
-/* ── SCANLINE OVERLAY ── */
-body::before {
-  content: ''; position: fixed; inset: 0; pointer-events: none; z-index: 1;
-  background: repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(0,0,0,.04) 2px, rgba(0,0,0,.04) 4px);
-}
+/* HEADER */
+.hdr{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:16px;padding-bottom:14px;border-bottom:1px solid var(--border2);}
+.hdr-sys{font-size:8px;letter-spacing:2px;text-transform:uppercase;color:var(--dim);margin-bottom:4px;}
+.hdr-title{font-family:'Playfair Display',serif;font-size:22px;font-weight:900;color:var(--text);}
+.hdr-title span{color:var(--gold);}
+.hdr-right{text-align:right;}
+.hdr-day{font-family:'Playfair Display',serif;font-size:20px;font-weight:900;color:var(--gold);line-height:1;}
+.hdr-date{font-size:9px;color:var(--dim);margin-top:2px;letter-spacing:0.5px;}
 
-/* ── SCREENS ── */
-.screen { position: fixed; inset: 0; overflow-y: auto; overflow-x: hidden; -webkit-overflow-scrolling: touch; display: none; z-index: 10; }
-.screen.active { display: block; }
+/* ARC BANNER */
+.arc-banner{background:var(--card);border:1px solid var(--border2);border-radius:4px;padding:9px 14px;margin-bottom:14px;display:flex;justify-content:space-between;align-items:center;gap:10px;}
+.arc-banner-left{display:flex;align-items:center;gap:6px;flex-wrap:wrap;}
+.arc-name{font-family:'Playfair Display',serif;font-size:12px;font-weight:700;color:var(--text);}
+.arc-empty{font-size:10px;color:var(--dim);font-style:italic;}
+.chip{font-size:8px;font-weight:700;letter-spacing:0.5px;padding:2px 8px;border-radius:2px;text-transform:uppercase;}
+.chip-GRIND{background:rgba(196,74,42,0.18);color:#E86A4A;border:1px solid rgba(196,74,42,0.3);}
+.chip-GHOST{background:rgba(42,106,140,0.18);color:#4A9AC4;border:1px solid rgba(42,106,140,0.3);}
+.chip-FLOW{background:rgba(74,140,92,0.18);color:#6ABD84;border:1px solid rgba(74,140,92,0.3);}
+.chip-SIEGE{background:rgba(140,42,42,0.18);color:#C46A6A;border:1px solid rgba(140,42,42,0.3);}
 
-/* ── TOP BAR ── */
-.topbar {
-  position: sticky; top: 0; z-index: 50;
-  background: rgba(7,9,15,.92); backdrop-filter: blur(12px);
-  border-bottom: 1px solid var(--border);
-  padding: calc(var(--sat) + 10px) 16px 10px;
-  display: flex; align-items: center; gap: 10px;
-}
-.topbar-left { flex: 1; }
-.app-tag { font-size: .56rem; letter-spacing: .28em; text-transform: uppercase; color: var(--accent); font-family: var(--font-m); margin-bottom: 2px; }
-.app-title { font-family: var(--font-h); font-size: 1.1rem; font-weight: 800; color: var(--text); line-height: 1; }
-.topbar-right { display: flex; gap: 8px; align-items: center; }
-.icon-btn {
-  width: 36px; height: 36px; border-radius: 6px;
-  background: var(--bg3); border: 1px solid var(--border2);
-  color: var(--text2); cursor: pointer; font-size: .9rem;
-  display: flex; align-items: center; justify-content: center;
-  -webkit-tap-highlight-color: transparent; transition: all .15s;
-}
-.icon-btn:active { background: var(--bg4); color: var(--text); }
+/* PANEL */
+.panel{background:var(--card);border:1px solid var(--border2);border-radius:4px;margin-bottom:12px;overflow:hidden;}
+.panel-hdr{display:flex;justify-content:space-between;align-items:center;padding:9px 14px;border-bottom:1px solid var(--border);background:var(--card2);}
+.panel-label{font-size:8px;letter-spacing:1.5px;text-transform:uppercase;color:var(--muted);font-weight:600;}
+.panel-body{padding:14px;}
 
-/* ── DAY SELECTOR ── */
-.day-bar {
-  background: var(--bg1); border-bottom: 1px solid var(--border);
-  padding: 10px 16px; display: flex; align-items: center; gap: 10px;
-}
-.day-pill {
-  background: var(--bg3); border: 1px solid var(--border2);
-  border-radius: 6px; padding: 6px 12px; font-family: var(--font-m);
-  font-size: .72rem; color: var(--accent); font-weight: 700;
-  letter-spacing: .1em; white-space: nowrap;
-}
-.day-date { font-size: .66rem; color: var(--text3); font-family: var(--font-m); flex: 1; }
-.day-nav { display: flex; gap: 4px; }
-.day-nav-btn {
-  width: 30px; height: 30px; border-radius: 4px;
-  background: var(--bg3); border: 1px solid var(--border);
-  color: var(--text2); cursor: pointer; font-size: .8rem;
-  display: flex; align-items: center; justify-content: center;
-  -webkit-tap-highlight-color: transparent;
-}
-.day-nav-btn:active { background: var(--bg4); }
+/* DAY NAV */
+.day-nav{display:flex;align-items:center;justify-content:space-between;background:var(--card);border:1px solid var(--border2);border-radius:4px;padding:10px 14px;margin-bottom:12px;}
+.day-nav-center{text-align:center;}
+.day-num{font-family:'Playfair Display',serif;font-size:18px;font-weight:900;color:var(--gold);line-height:1;}
+.day-date{font-size:9px;color:var(--dim);margin-top:2px;}
+.day-nav-btn{background:transparent;border:1px solid var(--border2);color:var(--muted);font-size:14px;width:32px;height:32px;border-radius:3px;cursor:pointer;transition:all .15s;display:flex;align-items:center;justify-content:center;}
+.day-nav-btn:hover{border-color:var(--gold);color:var(--gold);}
 
-/* ── TAB SWITCHER ── */
-.tab-switcher {
-  display: grid; grid-template-columns: 1fr 1fr;
-  margin: 12px 16px; border-radius: 8px; overflow: hidden;
-  border: 1px solid var(--border2); background: var(--bg2);
-}
-.tab-btn {
-  padding: 10px 8px; text-align: center; cursor: pointer;
-  font-family: var(--font-h); font-size: .7rem; font-weight: 700;
-  letter-spacing: .12em; text-transform: uppercase;
-  color: var(--text3); transition: all .2s;
-  -webkit-tap-highlight-color: transparent; border: none; background: transparent;
-  display: flex; align-items: center; justify-content: center; gap: 6px;
-}
-.tab-btn.morning.active { background: rgba(255,159,28,.12); color: var(--morning); }
-.tab-btn.evening.active { background: rgba(123,47,190,.15); color: var(--evening); }
-.tab-btn .tab-dot { width: 7px; height: 7px; border-radius: 50%; }
-.tab-btn.morning .tab-dot { background: var(--morning); }
-.tab-btn.evening .tab-dot { background: var(--evening); }
+/* TABS */
+.tabs{display:grid;grid-template-columns:1fr 1fr;gap:0;background:var(--card);border:1px solid var(--border2);border-radius:4px;overflow:hidden;margin-bottom:12px;}
+.tab{padding:10px;text-align:center;cursor:pointer;transition:all .15s;border:none;background:transparent;}
+.tab-label{font-size:9px;font-weight:700;letter-spacing:1px;text-transform:uppercase;}
+.tab.active-morning{background:var(--morning-l);border-bottom:2px solid var(--morning);}
+.tab.active-morning .tab-label{color:var(--morning);}
+.tab.active-evening{background:var(--evening-l);border-bottom:2px solid var(--evening);}
+.tab.active-evening .tab-label{color:var(--evening);}
+.tab:not(.active-morning):not(.active-evening) .tab-label{color:var(--dim);}
+.tab-icon{font-size:16px;margin-bottom:2px;}
 
-/* ── FORM CONTENT ── */
-.form-content { padding: 0 16px 120px; }
-.tab-panel { display: none; }
-.tab-panel.active { display: block; }
+/* FORM ELEMENTS */
+.form-group{display:flex;flex-direction:column;gap:4px;margin-bottom:12px;}
+.form-group:last-child{margin-bottom:0;}
+label{font-size:8px;letter-spacing:1px;text-transform:uppercase;color:var(--dim);font-weight:600;}
+select,input[type=text],textarea{background:var(--card2);border:1px solid var(--border2);color:var(--text);font-family:'Source Serif 4',Georgia,serif;font-size:11px;padding:7px 10px;border-radius:3px;outline:none;transition:border-color .15s;width:100%;}
+select:focus,input:focus,textarea:focus{border-color:var(--gold);}
+select option{background:#1C1C1A;}
+textarea{resize:vertical;min-height:56px;line-height:1.5;}
 
-/* ── SECTION CARD ── */
-.section-card {
-  background: var(--bg2); border: 1px solid var(--border);
-  border-radius: 10px; margin-bottom: 12px; overflow: hidden;
-}
-.section-card-hdr {
-  padding: 11px 14px; background: var(--bg3);
-  border-bottom: 1px solid var(--border);
-  display: flex; align-items: center; gap: 8px;
-}
-.section-num {
-  font-family: var(--font-m); font-size: .6rem; font-weight: 700;
-  color: var(--accent); width: 22px; height: 22px; border-radius: 4px;
-  background: rgba(79,255,176,.1); border: 1px solid rgba(79,255,176,.2);
-  display: flex; align-items: center; justify-content: center; flex-shrink: 0;
-}
-.section-title { font-family: var(--font-h); font-size: .78rem; font-weight: 700; color: var(--text); letter-spacing: .08em; text-transform: uppercase; }
-.section-body { padding: 14px; }
+/* SLIDER */
+.slider-wrap{display:flex;align-items:center;gap:10px;margin-top:4px;}
+input[type=range]{flex:1;-webkit-appearance:none;appearance:none;height:3px;background:var(--border3);border-radius:2px;outline:none;}
+input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:16px;height:16px;background:var(--gold);border-radius:50%;cursor:pointer;}
+.slider-val{font-family:'Playfair Display',serif;font-size:16px;font-weight:900;color:var(--gold);min-width:24px;text-align:right;}
 
-/* ── FIELDS ── */
-.field { margin-bottom: 14px; }
-.field:last-child { margin-bottom: 0; }
-.field-label {
-  font-size: .6rem; letter-spacing: .18em; text-transform: uppercase;
-  color: var(--text3); margin-bottom: 6px; display: flex;
-  align-items: center; justify-content: space-between;
-}
-.field-label span { color: var(--text2); font-size: .56rem; letter-spacing: 0; text-transform: none; }
+/* YES/NO */
+.yn-row{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-top:4px;}
+.yn-btn{background:var(--card2);border:1px solid var(--border2);color:var(--muted);font-family:'Source Serif 4',serif;font-size:10px;font-weight:600;letter-spacing:0.5px;padding:7px;border-radius:3px;cursor:pointer;transition:all .15s;text-transform:uppercase;}
+.yn-btn.yes-active{background:var(--good-l);border-color:var(--good);color:var(--good);}
+.yn-btn.no-active{background:var(--red-l);border-color:var(--red);color:var(--red);}
 
-/* Slider */
-.slider-wrap { display: flex; align-items: center; gap: 10px; }
-.slider-val {
-  font-family: var(--font-m); font-size: 1.1rem; font-weight: 700;
-  color: var(--accent); width: 28px; text-align: right; flex-shrink: 0;
-}
-input[type="range"] {
-  -webkit-appearance: none; flex: 1; height: 4px;
-  background: var(--bg4); border-radius: 2px; outline: none;
-  cursor: pointer;
-}
-input[type="range"]::-webkit-slider-thumb {
-  -webkit-appearance: none; width: 18px; height: 18px;
-  border-radius: 50%; background: var(--accent);
-  box-shadow: 0 0 8px rgba(79,255,176,.5); cursor: pointer;
-}
+/* PRIORITIES */
+.priority-list{display:flex;flex-direction:column;gap:6px;}
+.priority-item{display:flex;align-items:center;gap:8px;}
+.priority-num{font-size:9px;font-weight:700;color:var(--gold);min-width:14px;}
+.priority-input{flex:1;}
 
-/* Text input */
-.text-input {
-  width: 100%; background: var(--bg3); border: 1px solid var(--border2);
-  border-radius: 6px; padding: 10px 12px; color: var(--text);
-  font-family: var(--font-m); font-size: .82rem; outline: none;
-  transition: border-color .15s; resize: none;
-}
-.text-input:focus { border-color: var(--accent); }
-.text-input::placeholder { color: var(--text3); }
+/* SECTION DIVIDER */
+.step-label{font-size:8px;letter-spacing:2px;text-transform:uppercase;color:var(--gold);font-weight:700;margin-bottom:10px;padding-bottom:6px;border-bottom:1px solid var(--border);}
 
-/* Toggle */
-.toggle-row {
-  display: flex; align-items: center; justify-content: space-between;
-  padding: 10px 0; border-bottom: 1px solid var(--border);
-}
-.toggle-row:last-child { border-bottom: none; padding-bottom: 0; }
-.toggle-label { font-size: .78rem; color: var(--text2); font-family: var(--font-m); }
-.toggle-btns { display: flex; gap: 4px; }
-.toggle-btn {
-  padding: 5px 12px; border-radius: 4px; font-size: .62rem;
-  font-family: var(--font-m); font-weight: 700; letter-spacing: .08em;
-  cursor: pointer; border: 1px solid var(--border2);
-  background: var(--bg4); color: var(--text3); transition: all .15s;
-  -webkit-tap-highlight-color: transparent; text-transform: uppercase;
-}
-.toggle-btn.yes.active { background: rgba(79,255,176,.15); border-color: var(--good); color: var(--good); }
-.toggle-btn.no.active  { background: rgba(255,107,107,.12); border-color: var(--accent3); color: var(--accent3); }
+/* BUTTONS */
+.btn{font-family:'Source Serif 4',Georgia,serif;font-size:10px;font-weight:600;letter-spacing:0.5px;padding:8px 16px;border-radius:3px;border:none;cursor:pointer;transition:all .15s;text-transform:uppercase;}
+.btn-gold{background:var(--gold);color:#0E0E0C;}
+.btn-gold:hover{background:var(--gold-l);}
+.btn-ghost{background:transparent;color:var(--muted);border:1px solid var(--border2);}
+.btn-ghost:hover{border-color:var(--gold);color:var(--gold);}
+.btn-sm{padding:4px 10px;font-size:9px;}
+.btn-full{width:100%;padding:10px;margin-top:4px;}
+.btn-row{display:flex;gap:8px;margin-top:12px;}
 
-/* Priority inputs */
-.priority-list { display: flex; flex-direction: column; gap: 6px; }
-.priority-row { display: flex; align-items: center; gap: 8px; }
-.priority-num {
-  font-family: var(--font-m); font-size: .62rem; font-weight: 700;
-  color: var(--text3); width: 16px; flex-shrink: 0;
-}
+/* HISTORY */
+.history-item{background:var(--card2);border:1px solid var(--border);border-radius:3px;padding:12px;margin-bottom:8px;}
+.history-item:last-child{margin-bottom:0;}
+.history-hdr{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;}
+.history-date{font-family:'Playfair Display',serif;font-size:13px;font-weight:700;color:var(--text);}
+.history-day{font-size:9px;color:var(--dim);}
+.history-session{font-size:8px;font-weight:700;letter-spacing:0.5px;padding:2px 8px;border-radius:2px;text-transform:uppercase;}
+.session-morning{background:var(--morning-l);color:var(--morning);border:1px solid rgba(196,154,26,0.3);}
+.session-evening{background:var(--evening-l);color:var(--evening);border:1px solid rgba(74,106,156,0.3);}
+.history-field{font-size:10px;color:var(--muted);margin-bottom:3px;line-height:1.5;}
+.history-field strong{color:var(--text);font-weight:600;}
+.empty-state{font-size:10px;color:var(--dim);font-style:italic;padding:20px 0;text-align:center;}
 
-/* Mood select */
-.mood-select {
-  width: 100%; background: var(--bg3); border: 1px solid var(--border2);
-  border-radius: 6px; padding: 10px 12px; color: var(--text);
-  font-family: var(--font-m); font-size: .82rem; outline: none;
-  cursor: pointer; -webkit-appearance: none; appearance: none;
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%234A5568' stroke-width='1.5' fill='none'/%3E%3C/svg%3E");
-  background-repeat: no-repeat; background-position: right 12px center;
-  padding-right: 32px;
-}
-.mood-select:focus { border-color: var(--accent); }
-.mood-select option { background: var(--bg2); }
+/* METTLE */
+.mettle-flag{background:rgba(122,74,156,0.1);border:1px solid var(--ugly-b);border-radius:3px;padding:10px 12px;margin-top:8px;}
+.mettle-flag-label{font-size:8px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--ugly);margin-bottom:4px;}
+.mettle-flag-text{font-size:10px;color:var(--muted);line-height:1.5;font-style:italic;}
 
-/* ── SAVE BUTTON ── */
-.save-btn {
-  position: fixed; bottom: calc(16px + var(--sab)); left: 16px; right: 16px;
-  padding: 14px; border-radius: 10px; font-family: var(--font-h);
-  font-size: .88rem; font-weight: 800; letter-spacing: .14em;
-  text-transform: uppercase; cursor: pointer; border: none;
-  background: var(--accent); color: var(--bg0);
-  box-shadow: 0 4px 24px rgba(79,255,176,.25);
-  transition: all .2s; z-index: 100; -webkit-tap-highlight-color: transparent;
-}
-.save-btn.evening { background: var(--evening); box-shadow: 0 4px 24px rgba(123,47,190,.3); color: var(--text); }
-.save-btn:active { transform: scale(.97); }
-.save-btn.saved { background: var(--bg3); border: 1px solid var(--accent); color: var(--accent); }
+/* TOAST */
+.toast{position:fixed;bottom:20px;left:50%;transform:translateX(-50%) translateY(20px);background:var(--card);border:1px solid var(--gold);border-radius:3px;padding:8px 16px;font-size:10px;color:var(--text);opacity:0;transition:all .3s;z-index:200;white-space:nowrap;}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0);}
 
-/* ── STATUS INDICATOR ── */
-.status-dots { display: flex; gap: 4px; align-items: center; }
-.status-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--border2); }
-.status-dot.done { background: var(--accent); box-shadow: 0 0 6px rgba(79,255,176,.5); }
-
-/* ── HISTORY SCREEN ── */
-.history-hdr { padding: calc(var(--sat) + 14px) 16px 12px; border-bottom: 1px solid var(--border); background: var(--bg1); display: flex; align-items: center; gap: 10px; position: sticky; top: 0; z-index: 50; }
-.history-back { width: 32px; height: 32px; border-radius: 6px; background: var(--bg3); border: 1px solid var(--border2); color: var(--text2); cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 1rem; -webkit-tap-highlight-color: transparent; }
-.history-title { font-family: var(--font-h); font-size: .96rem; font-weight: 800; color: var(--text); flex: 1; }
-.history-download-btn { padding: 6px 12px; border-radius: 6px; background: var(--bg3); border: 1px solid var(--border2); color: var(--accent); font-size: .6rem; font-family: var(--font-m); letter-spacing: .12em; text-transform: uppercase; cursor: pointer; -webkit-tap-highlight-color: transparent; }
-.history-list { padding: 12px 16px 40px; }
-.history-item {
-  background: var(--bg2); border: 1px solid var(--border);
-  border-radius: 8px; margin-bottom: 8px; overflow: hidden; cursor: pointer;
-  -webkit-tap-highlight-color: transparent;
-}
-.history-item-hdr { padding: 10px 14px; display: flex; align-items: center; gap: 10px; border-bottom: 1px solid var(--border); }
-.hi-day { font-family: var(--font-m); font-size: .7rem; font-weight: 700; color: var(--accent); }
-.hi-date { font-size: .64rem; color: var(--text3); flex: 1; }
-.hi-phase { font-size: .56rem; letter-spacing: .14em; text-transform: uppercase; padding: 2px 7px; border-radius: 3px; }
-.hi-phase.morning { background: rgba(255,159,28,.12); color: var(--morning); }
-.hi-phase.evening { background: rgba(123,47,190,.15); color: var(--evening); }
-.hi-phase.both { background: rgba(79,255,176,.08); color: var(--accent); }
-.history-item-body { padding: 10px 14px; font-size: .74rem; color: var(--text2); line-height: 1.6; }
-.history-item-body strong { color: var(--text); }
-.history-empty { text-align: center; padding: 60px 24px; color: var(--text3); font-size: .8rem; line-height: 1.7; }
-
-/* ── TOAST ── */
-.toast {
-  position: fixed; bottom: calc(80px + var(--sab)); left: 50%; transform: translateX(-50%) translateY(20px);
-  background: var(--bg3); border: 1px solid var(--accent); border-radius: 8px;
-  padding: 10px 20px; font-size: .72rem; color: var(--accent); font-family: var(--font-m);
-  opacity: 0; transition: all .3s; z-index: 500; white-space: nowrap; pointer-events: none;
-}
-.toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
-
-/* ── RESPONSIVE ── */
-@media (min-width: 640px) {
-  .form-content { max-width: 600px; margin: 0 auto; }
-  .save-btn { max-width: 600px; left: 50%; transform: translateX(-50%); right: auto; width: calc(100% - 32px); }
-  .save-btn:active { transform: translateX(-50%) scale(.97); }
-}
+/* SECTION TOGGLE */
+.view{display:none;}
+.view.active{display:block;}
+.view-toggle{display:flex;gap:8px;margin-bottom:14px;}
 </style>
 </head>
 <body>
 
-<!-- ══ MAIN CHECK-IN SCREEN ══ -->
-<div class="screen active" id="screen-main">
-  <div class="topbar">
-    <div class="topbar-left">
-      <div class="app-tag">ALRPG · ARC 1</div>
-      <div class="app-title">Daily Check-In</div>
-    </div>
-    <div class="topbar-right">
-      <div class="status-dots" id="status-dots">
-        <div class="status-dot" id="dot-morning" title="Morning"></div>
-        <div class="status-dot" id="dot-evening" title="Evening"></div>
-      </div>
-      <button class="icon-btn" id="btn-history" title="History">📋</button>
-    </div>
-  </div>
-
-  <div class="day-bar">
-    <div class="day-pill" id="day-label">DAY 1</div>
-    <div class="day-date" id="day-date-label">—</div>
-    <div class="day-nav">
-      <button class="day-nav-btn" id="btn-prev-day">‹</button>
-      <button class="day-nav-btn" id="btn-next-day">›</button>
-    </div>
-  </div>
-
-  <div class="tab-switcher">
-    <button class="tab-btn morning active" id="tab-morning">
-      <div class="tab-dot"></div>☀ Morning
-    </button>
-    <button class="tab-btn evening" id="tab-evening">
-      <div class="tab-dot"></div>🌙 Evening
-    </button>
-  </div>
-
-  <div class="form-content">
-
-    <!-- MORNING PANEL -->
-    <div class="tab-panel active" id="panel-morning">
-
-      <div class="section-card">
-        <div class="section-card-hdr">
-          <div class="section-num">1</div>
-          <div class="section-title">State Scan</div>
-        </div>
-        <div class="section-body">
-          <div class="field">
-            <div class="field-label">Energy Level <span id="energy-display">5</span></div>
-            <div class="slider-wrap">
-              <span style="font-size:.6rem;color:var(--text3)">1</span>
-              <input type="range" id="energy" min="1" max="10" value="5">
-              <span class="slider-val" id="energy-val">5</span>
-            </div>
-          </div>
-          <div class="field">
-            <div class="field-label">Mood</div>
-            <select class="mood-select" id="mood">
-              <option value="">Select mood...</option>
-              <option>Focused</option><option>Content</option><option>Motivated</option>
-              <option>Neutral</option><option>Fatigued</option><option>Anxious</option>
-              <option>Frustrated</option><option>Low</option><option>Energized</option>
-              <option>Distracted</option><option>Calm</option><option>Stressed</option>
-            </select>
-          </div>
-          <div class="field">
-            <div class="field-label">Sleep Quality <span id="sleep-q-display">5</span></div>
-            <div class="slider-wrap">
-              <span style="font-size:.6rem;color:var(--text3)">1</span>
-              <input type="range" id="sleep-q" min="1" max="10" value="5">
-              <span class="slider-val" id="sleep-q-val">5</span>
-            </div>
-          </div>
-          <div class="field">
-            <div class="field-label">Hours Slept</div>
-            <div class="slider-wrap">
-              <span style="font-size:.6rem;color:var(--text3)">0</span>
-              <input type="range" id="hours-slept" min="0" max="12" step="0.5" value="7">
-              <span class="slider-val" id="hours-slept-val">7</span>
-            </div>
-          </div>
-          <div class="field">
-            <div class="field-label">Open METTLE Events?</div>
-            <textarea class="text-input" id="mettle-events" rows="2" placeholder="List any open METTLE events..."></textarea>
-          </div>
-        </div>
-      </div>
-
-      <div class="section-card">
-        <div class="section-card-hdr">
-          <div class="section-num">2</div>
-          <div class="section-title">Anchors</div>
-        </div>
-        <div class="section-body">
-          <div class="field">
-            <div class="toggle-row">
-              <span class="toggle-label">Morning Routine Complete?</span>
-              <div class="toggle-btns">
-                <button class="toggle-btn yes" data-field="morning-routine" data-val="Yes">YES</button>
-                <button class="toggle-btn no"  data-field="morning-routine" data-val="No">NO</button>
-              </div>
-            </div>
-          </div>
-          <div class="field">
-            <div class="field-label">Top 3 Priorities Today</div>
-            <div class="priority-list">
-              <div class="priority-row">
-                <span class="priority-num">1.</span>
-                <input type="text" class="text-input" id="p1" placeholder="Priority 1...">
-              </div>
-              <div class="priority-row">
-                <span class="priority-num">2.</span>
-                <input type="text" class="text-input" id="p2" placeholder="Priority 2...">
-              </div>
-              <div class="priority-row">
-                <span class="priority-num">3.</span>
-                <input type="text" class="text-input" id="p3" placeholder="Priority 3...">
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <div class="section-card">
-        <div class="section-card-hdr">
-          <div class="section-num">3</div>
-          <div class="section-title">Risk Forecast</div>
-        </div>
-        <div class="section-body">
-          <div class="toggle-row">
-            <span class="toggle-label">Entering Red Zones today?</span>
-            <div class="toggle-btns">
-              <button class="toggle-btn yes" data-field="red-zone-today" data-val="Yes">YES</button>
-              <button class="toggle-btn no"  data-field="red-zone-today" data-val="No">NO</button>
-            </div>
-          </div>
-          <div class="field" id="red-zone-which-wrap" style="margin-top:10px;display:none">
-            <div class="field-label">If yes, which ones?</div>
-            <textarea class="text-input" id="red-zone-which" rows="2" placeholder="Category 1, 2, 3..."></textarea>
-          </div>
-          <div class="toggle-row" style="margin-top:4px">
-            <span class="toggle-label">NCTM Mode needed?</span>
-            <div class="toggle-btns">
-              <button class="toggle-btn yes" data-field="nctm" data-val="Yes">YES</button>
-              <button class="toggle-btn no"  data-field="nctm" data-val="No">NO</button>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <div class="section-card">
-        <div class="section-card-hdr">
-          <div class="section-num">4</div>
-          <div class="section-title">Day Rule</div>
-        </div>
-        <div class="section-body">
-          <div class="field">
-            <div class="field-label">One non-negotiable boundary for today</div>
-            <textarea class="text-input" id="day-rule" rows="2" placeholder="My non-negotiable today is..."></textarea>
-          </div>
-        </div>
-      </div>
-
-    </div><!-- /panel-morning -->
-
-    <!-- EVENING PANEL -->
-    <div class="tab-panel" id="panel-evening">
-
-      <div class="section-card">
-        <div class="section-card-hdr">
-          <div class="section-num" style="background:rgba(123,47,190,.15);border-color:rgba(123,47,190,.3);color:var(--evening)">1</div>
-          <div class="section-title">Anchors Scored</div>
-        </div>
-        <div class="section-body">
-          <div class="toggle-row">
-            <span class="toggle-label">Core routine complete?</span>
-            <div class="toggle-btns">
-              <button class="toggle-btn yes" data-field="core-routine" data-val="Yes">YES</button>
-              <button class="toggle-btn no"  data-field="core-routine" data-val="No">NO</button>
-            </div>
-          </div>
-          <div class="toggle-row">
-            <span class="toggle-label">Day Rule honored?</span>
-            <div class="toggle-btns">
-              <button class="toggle-btn yes" data-field="day-rule-honored" data-val="Yes">YES</button>
-              <button class="toggle-btn no"  data-field="day-rule-honored" data-val="No">NO</button>
-            </div>
-          </div>
-          <div class="toggle-row">
-            <span class="toggle-label">Progress on top 3 priorities?</span>
-            <div class="toggle-btns">
-              <button class="toggle-btn yes" data-field="priorities-progress" data-val="Yes">YES</button>
-              <button class="toggle-btn no"  data-field="priorities-progress" data-val="No">NO</button>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <div class="section-card">
-        <div class="section-card-hdr">
-          <div class="section-num" style="background:rgba(123,47,190,.15);border-color:rgba(123,47,190,.3);color:var(--evening)">2</div>
-          <div class="section-title">Track Balance</div>
-        </div>
-        <div class="section-body">
-          <div class="field">
-            <div class="field-label">GOOD Track — Any failures today?</div>
-            <textarea class="text-input" id="good-failures" rows="2" placeholder="List any GOOD track failures..."></textarea>
-          </div>
-          <div class="toggle-row">
-            <span class="toggle-label">BAD Track: Stayed under 20%?</span>
-            <div class="toggle-btns">
-              <button class="toggle-btn yes" data-field="bad-under-20" data-val="Yes">YES</button>
-              <button class="toggle-btn no"  data-field="bad-under-20" data-val="No">NO</button>
-            </div>
-          </div>
-          <div class="toggle-row">
-            <span class="toggle-label">UGLY Track: Remained invisible?</span>
-            <div class="toggle-btns">
-              <button class="toggle-btn yes" data-field="ugly-invisible" data-val="Yes">YES</button>
-              <button class="toggle-btn no"  data-field="ugly-invisible" data-val="No">NO</button>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <div class="section-card">
-        <div class="section-card-hdr">
-          <div class="section-num" style="background:rgba(123,47,190,.15);border-color:rgba(123,47,190,.3);color:var(--evening)">3</div>
-          <div class="section-title">Red Zone Check</div>
-        </div>
-        <div class="section-body">
-          <div class="toggle-row">
-            <span class="toggle-label">Entered Red Zones?</span>
-            <div class="toggle-btns">
-              <button class="toggle-btn yes" data-field="rz-entered" data-val="Yes">YES</button>
-              <button class="toggle-btn no"  data-field="rz-entered" data-val="No">NO</button>
-            </div>
-          </div>
-          <div class="toggle-row">
-            <span class="toggle-label">Exited appropriately?</span>
-            <div class="toggle-btns">
-              <button class="toggle-btn yes" data-field="rz-exited" data-val="Yes">YES</button>
-              <button class="toggle-btn no"  data-field="rz-exited" data-val="No">NO</button>
-            </div>
-          </div>
-          <div class="field" style="margin-top:10px">
-            <div class="field-label">Escalation signs to watch tomorrow?</div>
-            <textarea class="text-input" id="escalation" rows="2" placeholder="Note any warning signs..."></textarea>
-          </div>
-        </div>
-      </div>
-
-      <div class="section-card">
-        <div class="section-card-hdr">
-          <div class="section-num" style="background:rgba(123,47,190,.15);border-color:rgba(123,47,190,.3);color:var(--evening)">4</div>
-          <div class="section-title">One-Line Truth</div>
-        </div>
-        <div class="section-body">
-          <div class="field">
-            <div class="field-label">One honest sentence about today</div>
-            <textarea class="text-input" id="one-line-truth" rows="3" placeholder="The truth about today is..."></textarea>
-          </div>
-        </div>
-      </div>
-
-    </div><!-- /panel-evening -->
-
-  </div><!-- /form-content -->
-
-  <button class="save-btn morning" id="save-btn">SAVE MORNING CHECK-IN</button>
-</div>
-
-<!-- ══ HISTORY SCREEN ══ -->
-<div class="screen" id="screen-history">
-  <div class="history-hdr">
-    <button class="history-back" id="btn-history-back">‹</button>
-    <div class="history-title">Check-In History</div>
-    <button class="history-download-btn" id="btn-download">↓ PDF</button>
-  </div>
-  <div class="history-list" id="history-list">
-    <div class="history-empty" id="history-empty">No history yet.<br>Complete your first check-in to see it here.</div>
-  </div>
-</div>
-
 <!-- TOAST -->
 <div class="toast" id="toast"></div>
 
-<script type="module">
-// ── FIREBASE ──
-import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
-import { getFirestore, doc, setDoc, getDoc, collection, getDocs, orderBy, query } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js';
+<!-- HEADER -->
+<div class="hdr">
+  <div>
+    <div class="hdr-sys">Sovereign System</div>
+    <div class="hdr-title">Daily <span>Check-In</span></div>
+  </div>
+  <div class="hdr-right">
+    <div class="hdr-day" id="hdrDay">—</div>
+    <div class="hdr-date" id="hdrDate">—</div>
+  </div>
+</div>
 
-const FB = initializeApp({
-  apiKey: "AIzaSyCWgmq19tMNS6-h8Bdp-rR80UKRrYG2yzQ",
-  authDomain: "alrpg-13e47.firebaseapp.com",
-  projectId: "alrpg-13e47",
-  storageBucket: "alrpg-13e47.firebasestorage.app",
-  messagingSenderId: "758497858726",
-  appId: "1:758497858726:web:af8349d3eb78349b641067"
-});
-const db = getFirestore(FB);
+<!-- ARC BANNER -->
+<div class="arc-banner">
+  <div class="arc-banner-left" id="arcBannerLeft">
+    <span class="arc-empty">No arc set</span>
+  </div>
+  <button class="btn btn-ghost btn-sm" onclick="window.location.href='#'">Action Log</button>
+</div>
 
-// ── STATE ──
-let currentDay = 1;
-let currentTab = 'morning';
-let arcStartDate = null;
-let toggleState = {};
-let allHistory = [];
+<!-- VIEW TOGGLE -->
+<div class="view-toggle">
+  <button class="btn btn-gold" onclick="showView('checkin',this)" id="btn-checkin">Check-In</button>
+  <button class="btn btn-ghost" onclick="showView('history',this)" id="btn-history">History</button>
+</div>
 
-// ── ARC START DATE ──
-function getArcStartDate() {
-  const stored = localStorage.getItem('alrpg_ci_arcstart');
-  if (stored) return new Date(stored);
-  const now = new Date();
-  now.setHours(0,0,0,0);
-  localStorage.setItem('alrpg_ci_arcstart', now.toISOString());
-  return now;
-}
+<!-- CHECK-IN VIEW -->
+<div class="view active" id="view-checkin">
 
-function getDayNumber(date) {
-  arcStartDate = getArcStartDate();
-  const diff = Math.floor((date - arcStartDate) / 86400000);
-  return Math.max(1, Math.min(90, diff + 1));
-}
+  <!-- Day Nav -->
+  <div class="day-nav">
+    <button class="day-nav-btn" onclick="changeDay(-1)">‹</button>
+    <div class="day-nav-center">
+      <div class="day-num" id="navDay">DAY 1</div>
+      <div class="day-date" id="navDate">—</div>
+    </div>
+    <button class="day-nav-btn" onclick="changeDay(1)">›</button>
+  </div>
 
-function dateForDay(dayNum) {
-  arcStartDate = getArcStartDate();
-  const d = new Date(arcStartDate);
-  d.setDate(d.getDate() + dayNum - 1);
-  return d;
-}
+  <!-- Morning / Evening Tabs -->
+  <div class="tabs">
+    <div class="tab active-morning" id="tab-morning" onclick="selectSession('morning')">
+      <div class="tab-icon">☀</div>
+      <div class="tab-label">Morning</div>
+    </div>
+    <div class="tab" id="tab-evening" onclick="selectSession('evening')">
+      <div class="tab-icon">🌙</div>
+      <div class="tab-label">Evening</div>
+    </div>
+  </div>
 
-function formatDate(d) {
-  return d.toLocaleDateString('en-US', { weekday:'short', month:'short', day:'numeric', year:'numeric' });
-}
+  <!-- MORNING FORM -->
+  <div id="form-morning">
+    <div class="panel">
+      <div class="panel-hdr"><span class="panel-label">1 — State Scan</span></div>
+      <div class="panel-body">
+        <div class="form-group">
+          <label>Energy Level</label>
+          <div class="slider-wrap">
+            <input type="range" min="1" max="5" value="3" id="m-energy" oninput="document.getElementById('m-energy-val').textContent=this.value">
+            <span class="slider-val" id="m-energy-val">3</span>
+          </div>
+        </div>
+        <div class="form-group">
+          <label>Mood</label>
+          <select id="m-mood">
+            <option value="">Select mood…</option>
+            <option>Focused</option><option>Content</option><option>Motivated</option>
+            <option>Neutral</option><option>Fatigued</option><option>Anxious</option>
+            <option>Frustrated</option><option>Low</option><option>Energized</option>
+            <option>Distracted</option><option>Calm</option><option>Stressed</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Sleep Quality</label>
+          <div class="slider-wrap">
+            <input type="range" min="1" max="5" value="3" id="m-sleep" oninput="document.getElementById('m-sleep-val').textContent=this.value">
+            <span class="slider-val" id="m-sleep-val">3</span>
+          </div>
+        </div>
+        <div class="form-group">
+          <label>Hours Slept</label>
+          <div class="slider-wrap">
+            <input type="range" min="0" max="12" value="7" id="m-hours" oninput="document.getElementById('m-hours-val').textContent=this.value">
+            <span class="slider-val" id="m-hours-val">7</span>
+          </div>
+        </div>
+        <div class="form-group">
+          <label>Open METTLE Events?</label>
+          <div class="yn-row">
+            <button class="yn-btn" id="m-mettle-yes" onclick="toggleYN('m-mettle','yes')">YES</button>
+            <button class="yn-btn" id="m-mettle-no" onclick="toggleYN('m-mettle','no')">NO</button>
+          </div>
+          <div class="mettle-flag" id="m-mettle-flag" style="display:none;">
+            <div class="mettle-flag-label">◆ METTLE Required</div>
+            <div class="mettle-flag-text">Complete the 5-Step Autopsy Worksheet before continuing. No writing = no METTLE.</div>
+          </div>
+        </div>
+      </div>
+    </div>
 
-// ── UI HELPERS ──
-function showToast(msg) {
-  const t = document.getElementById('toast');
-  t.textContent = msg; t.classList.add('show');
-  setTimeout(() => t.classList.remove('show'), 2400);
-}
+    <div class="panel">
+      <div class="panel-hdr"><span class="panel-label">2 — Anchors</span></div>
+      <div class="panel-body">
+        <div class="form-group">
+          <label>Morning Routine Complete?</label>
+          <div class="yn-row">
+            <button class="yn-btn" id="m-routine-yes" onclick="toggleYN('m-routine','yes')">YES</button>
+            <button class="yn-btn" id="m-routine-no" onclick="toggleYN('m-routine','no')">NO</button>
+          </div>
+        </div>
+        <div class="form-group">
+          <label>Top 3 Priorities Today</label>
+          <div class="priority-list">
+            <div class="priority-item"><span class="priority-num">1</span><input type="text" class="priority-input" id="m-p1" placeholder="Priority one…" maxlength="80"></div>
+            <div class="priority-item"><span class="priority-num">2</span><input type="text" class="priority-input" id="m-p2" placeholder="Priority two…" maxlength="80"></div>
+            <div class="priority-item"><span class="priority-num">3</span><input type="text" class="priority-input" id="m-p3" placeholder="Priority three…" maxlength="80"></div>
+          </div>
+        </div>
+      </div>
+    </div>
 
-function showScreen(id) {
-  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
-  document.getElementById(id).classList.add('active');
-}
+    <div class="panel">
+      <div class="panel-hdr"><span class="panel-label">3 — Risk Forecast</span></div>
+      <div class="panel-body">
+        <div class="form-group">
+          <label>Entering Red Zones today?</label>
+          <div class="yn-row">
+            <button class="yn-btn" id="m-redzone-yes" onclick="toggleYN('m-redzone','yes');document.getElementById('m-rz-detail').style.display='block'">YES</button>
+            <button class="yn-btn" id="m-redzone-no" onclick="toggleYN('m-redzone','no');document.getElementById('m-rz-detail').style.display='none'">NO</button>
+          </div>
+        </div>
+        <div id="m-rz-detail" style="display:none;">
+          <div class="form-group">
+            <label>Which ones?</label>
+            <textarea id="m-rz-which" placeholder="Category 1 (Attraction), 2 (Financial), 3 (Health), 4 (Career), 5 (Track Balance)…" style="min-height:44px;"></textarea>
+          </div>
+        </div>
+        <div class="form-group">
+          <label>NCTM Mode needed?</label>
+          <div class="yn-row">
+            <button class="yn-btn" id="m-nctm-yes" onclick="toggleYN('m-nctm','yes')">YES</button>
+            <button class="yn-btn" id="m-nctm-no" onclick="toggleYN('m-nctm','no')">NO</button>
+          </div>
+        </div>
+      </div>
+    </div>
 
-function updateDayLabel() {
-  const d = dateForDay(currentDay);
-  document.getElementById('day-label').textContent = `DAY ${currentDay}`;
-  document.getElementById('day-date-label').textContent = formatDate(d);
-}
+    <div class="panel">
+      <div class="panel-hdr"><span class="panel-label">4 — Day Rule</span></div>
+      <div class="panel-body">
+        <div class="form-group">
+          <label>One non-negotiable boundary for today</label>
+          <textarea id="m-dayrule" placeholder="e.g. No alcohol. No screens after 10pm. Honor all commitments made." style="min-height:44px;" maxlength="200"></textarea>
+        </div>
+      </div>
+    </div>
 
-// ── SLIDERS ──
-function initSliders() {
-  [['energy','energy-val'], ['sleep-q','sleep-q-val'], ['hours-slept','hours-slept-val']].forEach(([id, val]) => {
-    const el = document.getElementById(id);
-    const vo = document.getElementById(val);
-    el.addEventListener('input', () => { vo.textContent = el.value; });
-  });
-}
+    <button class="btn btn-gold btn-full" onclick="saveMorning()">Save Morning Check-In</button>
+  </div>
 
-// ── TOGGLES ──
-function initToggles() {
-  document.querySelectorAll('.toggle-btn').forEach(btn => {
-    btn.addEventListener('click', () => {
-      const field = btn.dataset.field;
-      const val = btn.dataset.val;
-      toggleState[field] = val;
-      // Update UI in same group
-      document.querySelectorAll(`[data-field="${field}"]`).forEach(b => b.classList.remove('active'));
-      btn.classList.add('active');
-      // Special: show red zone text if Yes
-      if (field === 'red-zone-today') {
-        document.getElementById('red-zone-which-wrap').style.display = val === 'Yes' ? 'block' : 'none';
-      }
-    });
-  });
-}
+  <!-- EVENING FORM -->
+  <div id="form-evening" style="display:none;">
+    <div class="panel">
+      <div class="panel-hdr"><span class="panel-label">1 — Anchors Scored</span></div>
+      <div class="panel-body">
+        <div class="form-group">
+          <label>Core routine complete?</label>
+          <div class="yn-row">
+            <button class="yn-btn" id="e-routine-yes" onclick="toggleYN('e-routine','yes')">YES</button>
+            <button class="yn-btn" id="e-routine-no" onclick="toggleYN('e-routine','no')">NO</button>
+          </div>
+        </div>
+        <div class="form-group">
+          <label>Day Rule honored?</label>
+          <div class="yn-row">
+            <button class="yn-btn" id="e-dayrule-yes" onclick="toggleYN('e-dayrule','yes')">YES</button>
+            <button class="yn-btn" id="e-dayrule-no" onclick="toggleYN('e-dayrule','no')">NO</button>
+          </div>
+        </div>
+        <div class="form-group">
+          <label>Progress on top 3 priorities?</label>
+          <div class="yn-row">
+            <button class="yn-btn" id="e-priorities-yes" onclick="toggleYN('e-priorities','yes')">YES</button>
+            <button class="yn-btn" id="e-priorities-no" onclick="toggleYN('e-priorities','no')">NO</button>
+          </div>
+        </div>
+      </div>
+    </div>
 
-// ── TABS ──
-function initTabs() {
-  document.getElementById('tab-morning').addEventListener('click', () => switchTab('morning'));
-  document.getElementById('tab-evening').addEventListener('click', () => switchTab('evening'));
-}
+    <div class="panel">
+      <div class="panel-hdr"><span class="panel-label">2 — Track Balance</span></div>
+      <div class="panel-body">
+        <div class="form-group">
+          <label>GOOD Track — Any failures today?</label>
+          <textarea id="e-good-fail" placeholder="Describe any GOOD track failures, or leave blank if clean…" style="min-height:44px;" maxlength="300"></textarea>
+        </div>
+        <div class="form-group">
+          <label>BAD Track: Stayed under 20%?</label>
+          <div class="yn-row">
+            <button class="yn-btn" id="e-bad-yes" onclick="toggleYN('e-bad','yes')">YES</button>
+            <button class="yn-btn" id="e-bad-no" onclick="toggleYN('e-bad','no')">NO</button>
+          </div>
+        </div>
+        <div class="form-group">
+          <label>UGLY Track: Remained invisible?</label>
+          <div class="yn-row">
+            <button class="yn-btn" id="e-ugly-yes" onclick="toggleYN('e-ugly','yes')">YES</button>
+            <button class="yn-btn" id="e-ugly-no" onclick="toggleYN('e-ugly','no')">NO</button>
+          </div>
+        </div>
+      </div>
+    </div>
 
-function switchTab(tab) {
-  currentTab = tab;
-  document.getElementById('tab-morning').classList.toggle('active', tab === 'morning');
-  document.getElementById('tab-evening').classList.toggle('active', tab === 'evening');
-  document.getElementById('panel-morning').classList.toggle('active', tab === 'morning');
-  document.getElementById('panel-evening').classList.toggle('active', tab === 'evening');
-  const btn = document.getElementById('save-btn');
-  btn.textContent = tab === 'morning' ? 'SAVE MORNING CHECK-IN' : 'SAVE EVENING CHECK-IN';
-  btn.className = `save-btn ${tab}`;
-}
+    <div class="panel">
+      <div class="panel-hdr"><span class="panel-label">3 — Red Zone Check</span></div>
+      <div class="panel-body">
+        <div class="form-group">
+          <label>Entered Red Zones?</label>
+          <div class="yn-row">
+            <button class="yn-btn" id="e-rz-yes" onclick="toggleYN('e-rz','yes');document.getElementById('e-rz-detail').style.display='block'">YES</button>
+            <button class="yn-btn" id="e-rz-no" onclick="toggleYN('e-rz','no');document.getElementById('e-rz-detail').style.display='none'">NO</button>
+          </div>
+        </div>
+        <div id="e-rz-detail" style="display:none;">
+          <div class="form-group">
+            <label>Exited appropriately?</label>
+            <div class="yn-row">
+              <button class="yn-btn" id="e-rz-exit-yes" onclick="toggleYN('e-rz-exit','yes')">YES</button>
+              <button class="yn-btn" id="e-rz-exit-no" onclick="toggleYN('e-rz-exit','no')">NO</button>
+            </div>
+          </div>
+          <div class="form-group">
+            <label>Escalation signs to watch tomorrow?</label>
+            <textarea id="e-rz-escalate" placeholder="Note any warning signs for tomorrow…" style="min-height:44px;" maxlength="200"></textarea>
+          </div>
+        </div>
+      </div>
+    </div>
 
-// ── GET FORM DATA ──
-function getMorningData() {
-  return {
-    energy: document.getElementById('energy').value,
-    mood: document.getElementById('mood').value,
-    sleepQuality: document.getElementById('sleep-q').value,
-    hoursSlept: document.getElementById('hours-slept').value,
-    mettleEvents: document.getElementById('mettle-events').value,
-    morningRoutine: toggleState['morning-routine'] || '',
-    priority1: document.getElementById('p1').value,
-    priority2: document.getElementById('p2').value,
-    priority3: document.getElementById('p3').value,
-    redZoneToday: toggleState['red-zone-today'] || '',
-    redZoneWhich: document.getElementById('red-zone-which').value,
-    nctmMode: toggleState['nctm'] || '',
-    dayRule: document.getElementById('day-rule').value,
-  };
-}
+    <div class="panel">
+      <div class="panel-hdr"><span class="panel-label">4 — One-Line Truth</span></div>
+      <div class="panel-body">
+        <div class="form-group">
+          <label>One honest sentence about today</label>
+          <textarea id="e-truth" placeholder="No spin. What actually happened today?" style="min-height:56px;" maxlength="280"></textarea>
+        </div>
+      </div>
+    </div>
 
-function getEveningData() {
-  return {
-    coreRoutine: toggleState['core-routine'] || '',
-    dayRuleHonored: toggleState['day-rule-honored'] || '',
-    prioritiesProgress: toggleState['priorities-progress'] || '',
-    goodFailures: document.getElementById('good-failures').value,
-    badUnder20: toggleState['bad-under-20'] || '',
-    uglyInvisible: toggleState['ugly-invisible'] || '',
-    rzEntered: toggleState['rz-entered'] || '',
-    rzExited: toggleState['rz-exited'] || '',
-    escalation: document.getElementById('escalation').value,
-    oneLineTruth: document.getElementById('one-line-truth').value,
-  };
-}
+    <button class="btn btn-gold btn-full" onclick="saveEvening()">Save Evening Check-In</button>
+  </div>
 
-// ── SAVE ──
-async function saveEntry() {
-  const dayKey = `day-${String(currentDay).padStart(2,'0')}`;
-  const dateStr = formatDate(dateForDay(currentDay));
-  const docRef = doc(db, 'alrpg', 'checkin', 'days', dayKey);
+</div>
 
-  try {
-    const existing = (await getDoc(docRef)).data() || {};
-    const update = {
-      day: currentDay,
-      date: dateStr,
-      dayKey,
-      updatedAt: new Date().toISOString(),
-    };
+<!-- HISTORY VIEW -->
+<div class="view" id="view-history">
+  <div class="panel">
+    <div class="panel-hdr">
+      <span class="panel-label">Check-In History</span>
+      <button class="btn btn-ghost btn-sm" onclick="exportPDF()">↓ PDF</button>
+    </div>
+    <div class="panel-body" id="historyList">
+      <div class="empty-state">No history yet. Complete your first check-in to see it here.</div>
+    </div>
+  </div>
+</div>
 
-    if (currentTab === 'morning') {
-      update.morning = getMorningData();
-      update.morningComplete = true;
-    } else {
-      update.evening = getEveningData();
-      update.eveningComplete = true;
-    }
+<script>
+const ARC_KEY = 'sovereign_arc_context';
+const CHECKIN_KEY = 'sovereign_checkin_history';
 
-    await setDoc(docRef, { ...existing, ...update }, { merge: true });
-    updateStatusDots({ ...existing, ...update });
-    showToast(`Day ${currentDay} ${currentTab === 'morning' ? 'morning' : 'evening'} saved ✓`);
-    document.getElementById('save-btn').classList.add('saved');
-    setTimeout(() => document.getElementById('save-btn').classList.remove('saved'), 1500);
-  } catch(e) {
-    showToast('Save failed — check connection');
-  }
-}
+let arc = JSON.parse(localStorage.getItem(ARC_KEY)||'null');
+let history = JSON.parse(localStorage.getItem(CHECKIN_KEY)||'[]');
+let currentSession = 'morning';
+let ynState = {};
+let viewDay = 0; // offset from today
 
-// ── LOAD DAY ──
-async function loadDay(dayNum) {
-  currentDay = dayNum;
-  updateDayLabel();
-  toggleState = {};
-  // Reset form
-  document.getElementById('energy').value = 5;
-  document.getElementById('energy-val').textContent = 5;
-  document.getElementById('sleep-q').value = 5;
-  document.getElementById('sleep-q-val').textContent = 5;
-  document.getElementById('hours-slept').value = 7;
-  document.getElementById('hours-slept-val').textContent = 7;
-  document.getElementById('mood').value = '';
-  document.getElementById('mettle-events').value = '';
-  document.getElementById('p1').value = '';
-  document.getElementById('p2').value = '';
-  document.getElementById('p3').value = '';
-  document.getElementById('red-zone-which').value = '';
-  document.getElementById('red-zone-which-wrap').style.display = 'none';
-  document.getElementById('day-rule').value = '';
-  document.getElementById('good-failures').value = '';
-  document.getElementById('escalation').value = '';
-  document.getElementById('one-line-truth').value = '';
-  document.querySelectorAll('.toggle-btn').forEach(b => b.classList.remove('active'));
-
-  try {
-    const dayKey = `day-${String(dayNum).padStart(2,'0')}`;
-    const snap = await getDoc(doc(db, 'alrpg', 'checkin', 'days', dayKey));
-    if (snap.exists()) {
-      const data = snap.data();
-      updateStatusDots(data);
-      if (data.morning) {
-        const m = data.morning;
-        if (m.energy) { document.getElementById('energy').value = m.energy; document.getElementById('energy-val').textContent = m.energy; }
-        if (m.mood) document.getElementById('mood').value = m.mood;
-        if (m.sleepQuality) { document.getElementById('sleep-q').value = m.sleepQuality; document.getElementById('sleep-q-val').textContent = m.sleepQuality; }
-        if (m.hoursSlept) { document.getElementById('hours-slept').value = m.hoursSlept; document.getElementById('hours-slept-val').textContent = m.hoursSlept; }
-        if (m.mettleEvents) document.getElementById('mettle-events').value = m.mettleEvents;
-        if (m.morningRoutine) { toggleState['morning-routine'] = m.morningRoutine; document.querySelector(`[data-field="morning-routine"][data-val="${m.morningRoutine}"]`)?.classList.add('active'); }
-        if (m.priority1) document.getElementById('p1').value = m.priority1;
-        if (m.priority2) document.getElementById('p2').value = m.priority2;
-        if (m.priority3) document.getElementById('p3').value = m.priority3;
-        if (m.redZoneToday) { toggleState['red-zone-today'] = m.redZoneToday; document.querySelector(`[data-field="red-zone-today"][data-val="${m.redZoneToday}"]`)?.classList.add('active'); if (m.redZoneToday === 'Yes') document.getElementById('red-zone-which-wrap').style.display = 'block'; }
-        if (m.redZoneWhich) document.getElementById('red-zone-which').value = m.redZoneWhich;
-        if (m.nctmMode) { toggleState['nctm'] = m.nctmMode; document.querySelector(`[data-field="nctm"][data-val="${m.nctmMode}"]`)?.classList.add('active'); }
-        if (m.dayRule) document.getElementById('day-rule').value = m.dayRule;
-      }
-      if (data.evening) {
-        const e = data.evening;
-        ['core-routine','day-rule-honored','priorities-progress','bad-under-20','ugly-invisible','rz-entered','rz-exited'].forEach(f => {
-          const fieldMap = { 'core-routine': e.coreRoutine, 'day-rule-honored': e.dayRuleHonored, 'priorities-progress': e.prioritiesProgress, 'bad-under-20': e.badUnder20, 'ugly-invisible': e.uglyInvisible, 'rz-entered': e.rzEntered, 'rz-exited': e.rzExited };
-          if (fieldMap[f]) { toggleState[f] = fieldMap[f]; document.querySelector(`[data-field="${f}"][data-val="${fieldMap[f]}"]`)?.classList.add('active'); }
-        });
-        if (e.goodFailures) document.getElementById('good-failures').value = e.goodFailures;
-        if (e.escalation) document.getElementById('escalation').value = e.escalation;
-        if (e.oneLineTruth) document.getElementById('one-line-truth').value = e.oneLineTruth;
-      }
-    } else {
-      updateStatusDots({});
-    }
-  } catch(e) { /* offline */ }
-}
-
-function updateStatusDots(data) {
-  document.getElementById('dot-morning').classList.toggle('done', !!data.morningComplete);
-  document.getElementById('dot-evening').classList.toggle('done', !!data.eveningComplete);
-}
-
-// ── HISTORY ──
-async function loadHistory() {
-  allHistory = [];
-  try {
-    const q = query(collection(db, 'alrpg', 'checkin', 'days'), orderBy('day', 'desc'));
-    const snap = await getDocs(q);
-    snap.forEach(d => allHistory.push(d.data()));
-  } catch(e) {
-    // Try without ordering
-    try {
-      const snap = await getDocs(collection(db, 'alrpg', 'checkin', 'days'));
-      snap.forEach(d => allHistory.push(d.data()));
-      allHistory.sort((a,b) => b.day - a.day);
-    } catch(e2) {}
-  }
+// ── INIT ──────────────────────────────────────────────────
+function init() {
+  updateHeader();
+  renderArcBanner();
+  updateDayNav();
   renderHistory();
 }
 
-function renderHistory() {
-  const list = document.getElementById('history-list');
-  const empty = document.getElementById('history-empty');
-  list.querySelectorAll('.history-item').forEach(i => i.remove());
-
-  if (!allHistory.length) { if(empty) empty.style.display = 'block'; return; }
-  if(empty) empty.style.display = 'none';
-
-  allHistory.forEach(entry => {
-    const phase = entry.morningComplete && entry.eveningComplete ? 'both' : entry.morningComplete ? 'morning' : entry.eveningComplete ? 'evening' : 'none';
-    const item = document.createElement('div');
-    item.className = 'history-item';
-    const m = entry.morning || {};
-    const e = entry.evening || {};
-    item.innerHTML = `
-      <div class="history-item-hdr">
-        <span class="hi-day">DAY ${entry.day}</span>
-        <span class="hi-date">${entry.date || ''}</span>
-        <span class="hi-phase ${phase}">${phase === 'both' ? 'Complete' : phase === 'morning' ? 'Morning Only' : phase === 'evening' ? 'Evening Only' : 'Empty'}</span>
-      </div>
-      <div class="history-item-body">
-        ${m.energy ? `<strong>Energy:</strong> ${m.energy}/10 &nbsp;·&nbsp; <strong>Mood:</strong> ${m.mood || '—'} &nbsp;·&nbsp; <strong>Sleep:</strong> ${m.hoursSlept}h` : ''}
-        ${m.priority1 ? `<br><strong>P1:</strong> ${m.priority1}` : ''}
-        ${m.priority2 ? `<br><strong>P2:</strong> ${m.priority2}` : ''}
-        ${m.priority3 ? `<br><strong>P3:</strong> ${m.priority3}` : ''}
-        ${e.oneLineTruth ? `<br><strong>Truth:</strong> "${e.oneLineTruth}"` : ''}
-      </div>`;
-    item.addEventListener('click', () => {
-      showScreen('screen-main');
-      loadDay(entry.day);
-    });
-    list.appendChild(item);
-  });
+// ── DATE ──────────────────────────────────────────────────
+function getViewDate() {
+  const d = new Date();
+  d.setDate(d.getDate() + viewDay);
+  return d;
 }
 
-// ── PDF DOWNLOAD ──
-async function downloadPDF() {
-  if (!allHistory.length) { showToast('No history to download'); return; }
-  showToast('Generating PDF...');
+function dateStr(d) {
+  return d.toISOString().slice(0,10);
+}
 
-  // Build HTML content
-  let html = `<html><head><meta charset="UTF-8"><style>
-    body{font-family:Georgia,serif;max-width:800px;margin:0 auto;padding:32px;color:#1a1a1a;font-size:13px}
-    h1{font-size:24px;margin-bottom:4px;color:#0A0E1A}
-    .subtitle{color:#666;font-size:12px;margin-bottom:32px}
-    .entry{margin-bottom:28px;border:1px solid #ddd;border-radius:6px;overflow:hidden;page-break-inside:avoid}
-    .entry-hdr{background:#0A0E1A;color:white;padding:10px 16px;display:flex;justify-content:space-between;align-items:center}
-    .entry-day{font-size:14px;font-weight:bold}
-    .entry-date{font-size:11px;opacity:.7}
-    .entry-body{padding:14px 16px}
-    .section{margin-bottom:12px}
-    .section-title{font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:#666;margin-bottom:6px;font-weight:bold}
-    .field-row{margin-bottom:5px;font-size:12px}
-    .field-label{color:#444;font-weight:bold}
-    .field-val{color:#1a1a1a}
-    .truth{font-style:italic;color:#333;border-left:3px solid #0A0E1A;padding-left:10px;margin-top:6px}
-  </style></head><body>
-  <h1>Daily Check-In History</h1>
-  <div class="subtitle">Antihero Life RPG System · Generated ${new Date().toLocaleDateString()}</div>`;
+function calcDayNumber(d) {
+  if (!arc || !arc.start) return null;
+  const start = new Date(arc.start + 'T00:00:00');
+  const target = new Date(dateStr(d) + 'T00:00:00');
+  const diff = Math.floor((target - start)/(1000*60*60*24)) + 1;
+  return diff > 0 ? diff : null;
+}
 
-  allHistory.slice().reverse().forEach(entry => {
-    const m = entry.morning || {};
-    const e = entry.evening || {};
-    html += `<div class="entry">
-      <div class="entry-hdr"><span class="entry-day">Day ${entry.day}</span><span class="entry-date">${entry.date || ''}</span></div>
-      <div class="entry-body">`;
+function updateHeader() {
+  const today = new Date();
+  const dayNum = calcDayNumber(today);
+  const opts = {weekday:'short',month:'short',day:'numeric'};
+  document.getElementById('hdrDate').textContent = today.toLocaleDateString('en-US',opts).toUpperCase();
+  document.getElementById('hdrDay').textContent = dayNum ? `DAY ${dayNum}` : '—';
+}
 
-    if (entry.morningComplete) {
-      html += `<div class="section"><div class="section-title">☀ Morning</div>
-        <div class="field-row"><span class="field-label">Energy:</span> <span class="field-val">${m.energy}/10</span> &nbsp; <span class="field-label">Mood:</span> <span class="field-val">${m.mood||'—'}</span> &nbsp; <span class="field-label">Sleep:</span> <span class="field-val">${m.sleepQuality}/10 · ${m.hoursSlept}h</span></div>
-        ${m.mettleEvents ? `<div class="field-row"><span class="field-label">METTLE Events:</span> <span class="field-val">${m.mettleEvents}</span></div>` : ''}
-        <div class="field-row"><span class="field-label">Morning Routine:</span> <span class="field-val">${m.morningRoutine||'—'}</span></div>
-        ${m.priority1 ? `<div class="field-row"><span class="field-label">P1:</span> <span class="field-val">${m.priority1}</span></div>` : ''}
-        ${m.priority2 ? `<div class="field-row"><span class="field-label">P2:</span> <span class="field-val">${m.priority2}</span></div>` : ''}
-        ${m.priority3 ? `<div class="field-row"><span class="field-label">P3:</span> <span class="field-val">${m.priority3}</span></div>` : ''}
-        <div class="field-row"><span class="field-label">Red Zones:</span> <span class="field-val">${m.redZoneToday||'—'}${m.redZoneWhich ? ' — '+m.redZoneWhich : ''}</span></div>
-        <div class="field-row"><span class="field-label">NCTM Mode:</span> <span class="field-val">${m.nctmMode||'—'}</span></div>
-        ${m.dayRule ? `<div class="field-row"><span class="field-label">Day Rule:</span> <span class="field-val">${m.dayRule}</span></div>` : ''}
-      </div>`;
-    }
+function updateDayNav() {
+  const d = getViewDate();
+  const dayNum = calcDayNumber(d);
+  const opts = {weekday:'long',month:'long',day:'numeric'};
+  document.getElementById('navDate').textContent = d.toLocaleDateString('en-US',opts);
+  document.getElementById('navDay').textContent = dayNum ? `DAY ${dayNum}` : d.toLocaleDateString('en-US',{month:'short',day:'numeric'});
+}
 
-    if (entry.eveningComplete) {
-      html += `<div class="section"><div class="section-title">🌙 Evening</div>
-        <div class="field-row"><span class="field-label">Core Routine:</span> <span class="field-val">${e.coreRoutine||'—'}</span> &nbsp; <span class="field-label">Day Rule:</span> <span class="field-val">${e.dayRuleHonored||'—'}</span> &nbsp; <span class="field-label">Priorities:</span> <span class="field-val">${e.prioritiesProgress||'—'}</span></div>
-        ${e.goodFailures ? `<div class="field-row"><span class="field-label">GOOD Failures:</span> <span class="field-val">${e.goodFailures}</span></div>` : ''}
-        <div class="field-row"><span class="field-label">BAD &lt;20%:</span> <span class="field-val">${e.badUnder20||'—'}</span> &nbsp; <span class="field-label">UGLY Invisible:</span> <span class="field-val">${e.uglyInvisible||'—'}</span></div>
-        <div class="field-row"><span class="field-label">Red Zones Entered:</span> <span class="field-val">${e.rzEntered||'—'}</span> &nbsp; <span class="field-label">Exited:</span> <span class="field-val">${e.rzExited||'—'}</span></div>
-        ${e.escalation ? `<div class="field-row"><span class="field-label">Escalation Signs:</span> <span class="field-val">${e.escalation}</span></div>` : ''}
-        ${e.oneLineTruth ? `<div class="truth">"${e.oneLineTruth}"</div>` : ''}
-      </div>`;
-    }
+function changeDay(dir) {
+  if (dir > 0 && viewDay >= 0) return; // can't go to future
+  viewDay += dir;
+  updateDayNav();
+  loadDayData();
+}
 
-    html += `</div></div>`;
-  });
+// ── ARC BANNER ────────────────────────────────────────────
+function renderArcBanner() {
+  const el = document.getElementById('arcBannerLeft');
+  if (!arc) {
+    el.innerHTML = '<span class="arc-empty">No arc set — configure in Action Log</span>';
+    return;
+  }
+  let html = `<span class="arc-name">${arc.name||'Unnamed Arc'}</span>`;
+  if (arc.mode) html += `<span class="chip chip-${arc.mode}">${arc.mode}</span>`;
+  el.innerHTML = html;
+}
 
-  html += '</body></html>';
+// ── SESSION TABS ──────────────────────────────────────────
+function selectSession(s) {
+  currentSession = s;
+  document.getElementById('tab-morning').className = 'tab' + (s==='morning'?' active-morning':'');
+  document.getElementById('tab-evening').className = 'tab' + (s==='evening'?' active-evening':'');
+  document.getElementById('form-morning').style.display = s==='morning'?'block':'none';
+  document.getElementById('form-evening').style.display = s==='evening'?'block':'none';
+  loadDayData();
+}
 
-  const w = window.open('', '_blank');
-  if (w) {
-    w.document.write(html);
-    w.document.close();
-    setTimeout(() => { w.print(); }, 500);
-  } else {
-    showToast('Allow popups to download PDF');
+// ── YES/NO BUTTONS ────────────────────────────────────────
+function toggleYN(key, val) {
+  ynState[key] = val;
+  const yes = document.getElementById(key+'-yes');
+  const no = document.getElementById(key+'-no');
+  if (yes) { yes.className = 'yn-btn' + (val==='yes'?' yes-active':''); }
+  if (no) { no.className = 'yn-btn' + (val==='no'?' no-active':''); }
+  // METTLE flag
+  if (key === 'm-mettle') {
+    document.getElementById('m-mettle-flag').style.display = val==='yes'?'block':'none';
   }
 }
 
-// ── INIT ──
-document.addEventListener('DOMContentLoaded', () => {
-  initSliders();
-  initToggles();
-  initTabs();
-
-  // Set today's day
-  currentDay = getDayNumber(new Date());
-  loadDay(currentDay);
-
-  // Day navigation
-  document.getElementById('btn-prev-day').addEventListener('click', () => {
-    if (currentDay > 1) loadDay(currentDay - 1);
-  });
-  document.getElementById('btn-next-day').addEventListener('click', () => {
-    if (currentDay < 90) loadDay(currentDay + 1);
-  });
-
-  // History
-  document.getElementById('btn-history').addEventListener('click', () => {
-    showScreen('screen-history');
-    loadHistory();
-  });
-  document.getElementById('btn-history-back').addEventListener('click', () => showScreen('screen-main'));
-  document.getElementById('btn-download').addEventListener('click', downloadPDF);
-
-  // Save
-  document.getElementById('save-btn').addEventListener('click', saveEntry);
-});
-
-// Service worker
-if ('serviceWorker' in navigator) {
-  window.addEventListener('load', () => {
-    navigator.serviceWorker.register('/Sovereign-DailyCheckIn/sw.js', { scope: '/Sovereign-DailyCheckIn/' }).catch(() => {});
-  });
+function setYN(key, val) {
+  ynState[key] = val;
+  const yes = document.getElementById(key+'-yes');
+  const no = document.getElementById(key+'-no');
+  if (yes) yes.className = 'yn-btn' + (val==='yes'?' yes-active':'');
+  if (no) no.className = 'yn-btn' + (val==='no'?' no-active':'');
 }
+
+// ── SAVE ──────────────────────────────────────────────────
+function saveMorning() {
+  const d = getViewDate();
+  const entry = {
+    id: Date.now(),
+    date: dateStr(d),
+    dayNum: calcDayNumber(d),
+    session: 'morning',
+    energy: document.getElementById('m-energy').value,
+    mood: document.getElementById('m-mood').value,
+    sleep: document.getElementById('m-sleep').value,
+    hours: document.getElementById('m-hours').value,
+    mettle: ynState['m-mettle']||'',
+    routine: ynState['m-routine']||'',
+    p1: document.getElementById('m-p1').value.trim(),
+    p2: document.getElementById('m-p2').value.trim(),
+    p3: document.getElementById('m-p3').value.trim(),
+    redzone: ynState['m-redzone']||'',
+    rzWhich: document.getElementById('m-rz-which')?.value?.trim()||'',
+    nctm: ynState['m-nctm']||'',
+    dayrule: document.getElementById('m-dayrule').value.trim(),
+  };
+  saveEntry(entry);
+  showToast('Morning check-in saved');
+}
+
+function saveEvening() {
+  const d = getViewDate();
+  const entry = {
+    id: Date.now(),
+    date: dateStr(d),
+    dayNum: calcDayNumber(d),
+    session: 'evening',
+    routine: ynState['e-routine']||'',
+    dayrule: ynState['e-dayrule']||'',
+    priorities: ynState['e-priorities']||'',
+    goodFail: document.getElementById('e-good-fail').value.trim(),
+    badTrack: ynState['e-bad']||'',
+    uglyTrack: ynState['e-ugly']||'',
+    redzone: ynState['e-rz']||'',
+    rzExit: ynState['e-rz-exit']||'',
+    rzEscalate: document.getElementById('e-rz-escalate')?.value?.trim()||'',
+    truth: document.getElementById('e-truth').value.trim(),
+  };
+  saveEntry(entry);
+  showToast('Evening check-in saved');
+}
+
+function saveEntry(entry) {
+  // Replace if same date + session exists
+  const idx = history.findIndex(h=>h.date===entry.date && h.session===entry.session);
+  if (idx>=0) history[idx] = entry;
+  else history.push(entry);
+  localStorage.setItem(CHECKIN_KEY, JSON.stringify(history));
+  renderHistory();
+}
+
+// ── LOAD DAY ──────────────────────────────────────────────
+function loadDayData() {
+  const d = getViewDate();
+  const ds = dateStr(d);
+  const entry = history.find(h=>h.date===ds && h.session===currentSession);
+  if (!entry) { resetForm(); return; }
+  if (currentSession === 'morning') {
+    document.getElementById('m-energy').value = entry.energy||3;
+    document.getElementById('m-energy-val').textContent = entry.energy||3;
+    document.getElementById('m-mood').value = entry.mood||'';
+    document.getElementById('m-sleep').value = entry.sleep||3;
+    document.getElementById('m-sleep-val').textContent = entry.sleep||3;
+    document.getElementById('m-hours').value = entry.hours||7;
+    document.getElementById('m-hours-val').textContent = entry.hours||7;
+    document.getElementById('m-p1').value = entry.p1||'';
+    document.getElementById('m-p2').value = entry.p2||'';
+    document.getElementById('m-p3').value = entry.p3||'';
+    document.getElementById('m-dayrule').value = entry.dayrule||'';
+    document.getElementById('m-rz-which').value = entry.rzWhich||'';
+    if (entry.mettle) setYN('m-mettle', entry.mettle);
+    if (entry.routine) setYN('m-routine', entry.routine);
+    if (entry.redzone) { setYN('m-redzone', entry.redzone); if(entry.redzone==='yes') document.getElementById('m-rz-detail').style.display='block'; }
+    if (entry.nctm) setYN('m-nctm', entry.nctm);
+  } else {
+    document.getElementById('e-good-fail').value = entry.goodFail||'';
+    document.getElementById('e-truth').value = entry.truth||'';
+    document.getElementById('e-rz-escalate').value = entry.rzEscalate||'';
+    if (entry.routine) setYN('e-routine', entry.routine);
+    if (entry.dayrule) setYN('e-dayrule', entry.dayrule);
+    if (entry.priorities) setYN('e-priorities', entry.priorities);
+    if (entry.badTrack) setYN('e-bad', entry.badTrack);
+    if (entry.uglyTrack) setYN('e-ugly', entry.uglyTrack);
+    if (entry.redzone) { setYN('e-rz', entry.redzone); if(entry.redzone==='yes') document.getElementById('e-rz-detail').style.display='block'; }
+    if (entry.rzExit) setYN('e-rz-exit', entry.rzExit);
+  }
+}
+
+function resetForm() {
+  ynState = {};
+  document.querySelectorAll('.yn-btn').forEach(b=>b.className='yn-btn');
+  document.querySelectorAll('textarea, input[type=text]').forEach(t=>t.value='');
+  document.querySelectorAll('.yn-detail').forEach(d=>d.style.display='none');
+  document.getElementById('m-rz-detail').style.display='none';
+  document.getElementById('e-rz-detail').style.display='none';
+  document.getElementById('m-mettle-flag').style.display='none';
+}
+
+// ── HISTORY ───────────────────────────────────────────────
+function renderHistory() {
+  const el = document.getElementById('historyList');
+  if (!history.length) {
+    el.innerHTML = '<div class="empty-state">No history yet. Complete your first check-in to see it here.</div>';
+    return;
+  }
+  const sorted = [...history].sort((a,b)=>b.date.localeCompare(a.date)||b.session.localeCompare(a.session));
+  el.innerHTML = sorted.map(h => {
+    const isMorning = h.session === 'morning';
+    const dayLabel = h.dayNum ? `Day ${h.dayNum}` : h.date;
+    let fields = '';
+    if (isMorning) {
+      if (h.mood) fields += `<div class="history-field"><strong>Mood:</strong> ${h.mood} · Energy ${h.energy}/5 · Sleep ${h.sleep}/5 (${h.hours}h)</div>`;
+      if (h.p1) fields += `<div class="history-field"><strong>Priorities:</strong> ${[h.p1,h.p2,h.p3].filter(Boolean).join(' · ')}</div>`;
+      if (h.dayrule) fields += `<div class="history-field"><strong>Day Rule:</strong> ${h.dayrule}</div>`;
+    } else {
+      if (h.truth) fields += `<div class="history-field"><strong>Truth:</strong> ${h.truth}</div>`;
+      const checks = [];
+      if (h.routine) checks.push(`Routine: ${h.routine}`);
+      if (h.dayrule) checks.push(`Day Rule: ${h.dayrule}`);
+      if (h.badTrack) checks.push(`BAD ≤20%: ${h.badTrack}`);
+      if (h.uglyTrack) checks.push(`UGLY invisible: ${h.uglyTrack}`);
+      if (checks.length) fields += `<div class="history-field">${checks.join(' · ')}</div>`;
+    }
+    return `
+      <div class="history-item">
+        <div class="history-hdr">
+          <div>
+            <div class="history-date">${dayLabel}</div>
+            <div class="history-day">${h.date}</div>
+          </div>
+          <span class="history-session session-${h.session}">${isMorning?'☀ Morning':'🌙 Evening'}</span>
+        </div>
+        ${fields || '<div class="history-field" style="font-style:italic;color:var(--dim);">No details recorded.</div>'}
+      </div>
+    `;
+  }).join('');
+}
+
+// ── PDF EXPORT ────────────────────────────────────────────
+function exportPDF() { window.print(); }
+
+// ── VIEW TOGGLE ───────────────────────────────────────────
+function showView(name, btn) {
+  document.querySelectorAll('.view').forEach(v=>v.classList.remove('active'));
+  document.getElementById('view-'+name).classList.add('active');
+  document.getElementById('btn-checkin').className = name==='checkin'?'btn btn-gold':'btn btn-ghost';
+  document.getElementById('btn-history').className = name==='history'?'btn btn-gold':'btn btn-ghost';
+}
+
+// ── TOAST ─────────────────────────────────────────────────
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(()=>t.classList.remove('show'), 2200);
+}
+
+init();
 </script>
 </body>
 </html>
