@@ -406,7 +406,7 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:16px;heigh
   <div class="panel">
     <div class="panel-hdr">
       <span class="panel-label">Check-In History</span>
-      <button class="btn btn-ghost btn-sm" onclick="exportPDF()">↓ PDF</button>
+      <button class="btn btn-ghost btn-sm" onclick="exportCheckinPDF()">↓ PDF</button>
     </div>
     <div class="panel-body" id="historyList">
       <div class="empty-state">No history yet. Complete your first check-in to see it here.</div>
@@ -418,18 +418,86 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:16px;heigh
 const ARC_KEY = 'sovereign_arc_context';
 const CHECKIN_KEY = 'sovereign_checkin_history';
 
+// ── FIREBASE ──────────────────────────────────────────────
+const FB_CFG = {
+  apiKey: "AIzaSyCWgmq19tMNS6-h8Bdp-rR80UKRrYG2yzQ",
+  authDomain: "alrpg-13e47.firebaseapp.com",
+  projectId: "alrpg-13e47",
+  storageBucket: "alrpg-13e47.firebasestorage.app",
+  messagingSenderId: "758497858726",
+  appId: "1:758497858726:web:af8349d3eb78349b641067"
+};
+const CHECKIN_DOC = 'alrpg/checkin';
+let db = null;
+let fbReady = false;
+
+function loadScript(src) {
+  return new Promise((res, rej) => {
+    const s = document.createElement('script');
+    s.src = src; s.async = true;
+    s.onload = res;
+    s.onerror = () => rej(new Error('Failed: ' + src));
+    document.head.appendChild(s);
+  });
+}
+
+async function initFirebase() {
+  try {
+    await loadScript('https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js');
+    await loadScript('https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js');
+    if (!window.firebase.apps || !window.firebase.apps.length) {
+      window.firebase.initializeApp(FB_CFG);
+    }
+    db = window.firebase.firestore();
+    fbReady = true;
+    // Pull remote history
+    const snap = await db.doc(CHECKIN_DOC).get();
+    if (snap.exists) {
+      const remote = snap.data().history || [];
+      if (remote.length) {
+        history = remote;
+        localStorage.setItem(CHECKIN_KEY, JSON.stringify(history));
+      }
+    }
+    // Subscribe to live updates
+    db.doc(CHECKIN_DOC).onSnapshot(snap => {
+      if (!snap.exists) return;
+      const remote = snap.data().history || [];
+      if (remote.length) {
+        history = remote;
+        localStorage.setItem(CHECKIN_KEY, JSON.stringify(history));
+        renderHistory();
+      }
+    });
+  } catch(e) {
+    console.warn('Firebase unavailable, running offline:', e.message);
+  }
+}
+
+async function saveToFirebase() {
+  if (!fbReady || !db) return;
+  try {
+    await db.doc(CHECKIN_DOC).set({ history, updatedAt: new Date().toISOString() }, { merge: true });
+  } catch(e) {
+    console.warn('Firebase write error:', e.message);
+  }
+}
+
 let arc = JSON.parse(localStorage.getItem(ARC_KEY)||'null');
 let history = JSON.parse(localStorage.getItem(CHECKIN_KEY)||'[]');
 let currentSession = 'morning';
 let ynState = {};
-let viewDay = 0; // offset from today
+let viewDay = 0;
 
 // ── INIT ──────────────────────────────────────────────────
-function init() {
+async function init() {
+  // Clear stale date key
+  localStorage.removeItem('alrpg_last_date');
   updateHeader();
   renderArcBanner();
   updateDayNav();
   renderHistory();
+  await initFirebase();
 }
 
 // ── DATE ──────────────────────────────────────────────────
@@ -566,11 +634,11 @@ function saveEvening() {
 }
 
 function saveEntry(entry) {
-  // Replace if same date + session exists
   const idx = history.findIndex(h=>h.date===entry.date && h.session===entry.session);
   if (idx>=0) history[idx] = entry;
   else history.push(entry);
   localStorage.setItem(CHECKIN_KEY, JSON.stringify(history));
+  saveToFirebase();
   renderHistory();
 }
 
@@ -662,10 +730,97 @@ function renderHistory() {
 }
 
 // ── PDF EXPORT ────────────────────────────────────────────
-function exportPDF() { window.print(); }
+function exportCheckinPDF() {
+  if (!history.length) { showToast('No history to export'); return; }
+  const arcName = arc?.name || 'Sovereign Arc';
+  const sorted = [...history].sort((a,b) => a.date.localeCompare(b.date) || a.session.localeCompare(b.session));
+  const totalM = sorted.filter(h=>h.session==='morning').length;
+  const totalE = sorted.filter(h=>h.session==='evening').length;
+  const dayRuleHonored = sorted.filter(h=>h.session==='evening'&&h.dayrule==='yes').length;
+  const totalEvening = sorted.filter(h=>h.session==='evening').length;
+  const pctHonored = totalEvening ? Math.round((dayRuleHonored/totalEvening)*100) : 0;
 
-// ── VIEW TOGGLE ───────────────────────────────────────────
-function showView(name, btn) {
+  let rows = '';
+  sorted.forEach(h => {
+    const isMorning = h.session === 'morning';
+    const dayLabel = h.dayNum ? `Day ${h.dayNum}` : '—';
+    let detail = '';
+    if (isMorning) {
+      detail = [
+        h.mood ? `Mood: ${h.mood}` : '',
+        h.energy ? `Energy: ${h.energy}/5` : '',
+        h.sleep ? `Sleep: ${h.sleep}/5 (${h.hours}h)` : '',
+        h.p1 ? `P1: ${h.p1}` : '',
+        h.p2 ? `P2: ${h.p2}` : '',
+        h.p3 ? `P3: ${h.p3}` : '',
+        h.dayrule ? `Day Rule: ${h.dayrule}` : '',
+        h.redzone === 'yes' ? `⚠ Red Zone: ${h.rzWhich||'yes'}` : '',
+      ].filter(Boolean).join(' · ');
+    } else {
+      detail = [
+        h.truth ? `Truth: ${h.truth}` : '',
+        h.dayrule ? `Day Rule: ${h.dayrule}` : '',
+        h.routine ? `Routine: ${h.routine}` : '',
+        h.badTrack ? `BAD ≤20%: ${h.badTrack}` : '',
+        h.uglyTrack ? `UGLY invisible: ${h.uglyTrack}` : '',
+        h.redzone === 'yes' ? `⚠ Red Zone` : '',
+      ].filter(Boolean).join(' · ');
+    }
+    rows += `
+      <tr>
+        <td>${h.date}</td>
+        <td>${dayLabel}</td>
+        <td style="text-align:center;color:${isMorning?'#C49A1A':'#4A6A9C'};font-weight:700;">${isMorning?'☀ Morning':'🌙 Evening'}</td>
+        <td style="font-size:10px;color:#555;">${detail}</td>
+      </tr>`;
+  });
+
+  const html = `<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>${arcName} — Daily Check-In History</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: Georgia, serif; background: #fff; color: #1a1a1a; padding: 40px; font-size: 12px; }
+  h1 { font-size: 22px; font-weight: 700; margin-bottom: 4px; }
+  .sub { font-size: 11px; color: #666; margin-bottom: 24px; }
+  .summary { display: flex; gap: 20px; margin-bottom: 24px; padding: 14px 18px; background: #f8f5f0; border-left: 3px solid #B8962E; flex-wrap: wrap; }
+  .sm { text-align: center; min-width: 80px; }
+  .sm-val { font-size: 18px; font-weight: 700; color: #B8962E; }
+  .sm-lbl { font-size: 10px; color: #888; text-transform: uppercase; letter-spacing: 1px; margin-top: 2px; }
+  table { width: 100%; border-collapse: collapse; }
+  th { background: #1a1a1a; color: #B8962E; font-size: 10px; letter-spacing: 1px; text-transform: uppercase; padding: 8px 10px; text-align: left; }
+  td { padding: 7px 10px; border-bottom: 1px solid #eee; font-size: 11px; vertical-align: top; }
+  tr:nth-child(even) td { background: #fafafa; }
+  .footer { margin-top: 24px; font-size: 10px; color: #aaa; text-align: center; }
+</style>
+</head>
+<body>
+<h1>${arcName} — Daily Check-In History</h1>
+<div class="sub">Generated ${new Date().toLocaleDateString('en-US',{weekday:'long',year:'numeric',month:'long',day:'numeric'})}</div>
+<div class="summary">
+  <div class="sm"><div class="sm-val">${totalM}</div><div class="sm-lbl">Morning Check-Ins</div></div>
+  <div class="sm"><div class="sm-val">${totalE}</div><div class="sm-lbl">Evening Check-Ins</div></div>
+  <div class="sm"><div class="sm-val">${pctHonored}%</div><div class="sm-lbl">Day Rule Honored</div></div>
+</div>
+<table>
+  <thead><tr><th>Date</th><th>Day</th><th>Session</th><th>Detail</th></tr></thead>
+  <tbody>${rows}</tbody>
+</table>
+<div class="footer">Antihero Life RPG System · Daily Check-In · Sovereign</div>
+</body>
+</html>`;
+
+  const win = window.open('', '_blank');
+  if (!win) { showToast('Allow popups then try again'); return; }
+  win.document.write(html);
+  win.document.close();
+  win.focus();
+  setTimeout(() => win.print(), 400);
+}
+
+function showToast(msg) {
   document.querySelectorAll('.view').forEach(v=>v.classList.remove('active'));
   document.getElementById('view-'+name).classList.add('active');
   document.getElementById('btn-checkin').className = name==='checkin'?'btn btn-gold':'btn btn-ghost';
@@ -678,6 +833,14 @@ function showToast(msg) {
   t.textContent = msg;
   t.classList.add('show');
   setTimeout(()=>t.classList.remove('show'), 2200);
+}
+
+// ── VIEW TOGGLE ───────────────────────────────────────────
+function showView(name, btn) {
+  document.querySelectorAll('.view').forEach(v=>v.classList.remove('active'));
+  document.getElementById('view-'+name).classList.add('active');
+  document.getElementById('btn-checkin').className = name==='checkin'?'btn btn-gold':'btn btn-ghost';
+  document.getElementById('btn-history').className = name==='history'?'btn btn-gold':'btn btn-ghost';
 }
 
 init();
